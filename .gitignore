@@ -1,0 +1,5 @@
+.idea
+*.csv
+*.pyc
+venv
+cached_pages
