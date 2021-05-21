@@ -108,7 +108,7 @@ def main():
     main_box = soup.find_all("div", class_="mainBox")[0]
 
     # use this for debugging
-    # get_details(result=Result(url="https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-jasien-potegowska-35m2-mzn2038736185", short_title="", short_description=""), ddp=ddp, lock=lock)
+    # get_details(result=Result(url="https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-jasien-potegowska-35m2-mzn2038736185", short_title="", short_description=""))
 
     footer = main_box.find_next('footer')
     pagination_ul = footer.ul
@@ -128,11 +128,13 @@ def main():
     # wait a minute until completed
     wait(tasks, timeout=60)
 
-    pool.map(get_details, results, timeout=300)
+    pool.map(get_details, results, timeout=600)
 
     with codecs.open(result_file, "w", encoding="utf-8") as f:
         w = DataclassWriter(f, results, Result)
         w.write()
+
+    pool.shutdown(wait=True)
 
     print(f'saved results for {url} to {result_file}')
 
@@ -207,7 +209,7 @@ def get_details(result: Result) -> Result:
     if date_added:
         try:
             ddp = DateDataParser(languages=['pl'])
-            date_added = ddp.get_date_data(date_added).date()
+            date_added = ddp.get_date_data(date_added).date_obj.date()
         except (ValueError, TypeError):
             pass
 
